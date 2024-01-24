@@ -50,7 +50,7 @@ const getUser = (data) => {
 const createTable = async () => {
   try {
     await pool.query(
-      "CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255))"
+      "CREATE TABLE users (id SERIAL PRIMARY KEY, first_name VARCHAR(255), email VARCHAR(255))"
     );
     console.log("Table created successfully");
   } catch (error) {
