@@ -26,31 +26,23 @@ const getUserById = (request, response) => {
   });
 };
 
-const getUser = (data) => {
+const getUser = async (data) => {
   try {
-    const user = pool.query(
-      "SELECT * FROM users WHERE name = $1",
-      [data.name],
-      (error, results) => {
-        if (error) {
-          throw error;
-        }
-        return results.rows;
-      }
-    );
-    console.log("User", user);
+    const resp = await pool.query("SELECT * FROM users WHERE email = $1", [
+      data.email,
+    ]);
 
-    return user;
+    return resp.rows;
   } catch (err) {
     console.log("ERRRRRR", err.message);
-    return { status: 404, message: "Internal server error" };
+    return { status: 500, message: "Internal server error" };
   }
 };
 
 const createTable = async () => {
   try {
     await pool.query(
-      "CREATE TABLE users (id SERIAL PRIMARY KEY, first_name VARCHAR(255), email VARCHAR(255))"
+      "CREATE TABLE users (id SERIAL PRIMARY KEY, uid VARCHAR(255), name VARCHAR(255), email VARCHAR(255))"
     );
     console.log("Table created successfully");
   } catch (error) {
@@ -70,25 +62,24 @@ const getTable = async () => {
 };
 
 const createUser = async (data) => {
-  const { name, email, id } = data;
-  let res = null;
+  const { name, email, uid } = data;
   try {
     const tableExists = await getTable();
     if (!tableExists) {
       await createTable();
-      await pool.query("INSERT INTO users (name, email) VALUES ($1, $2)", [
-        name,
-        email,
-      ]);
+      await pool.query(
+        "INSERT INTO users (uid, name, email) VALUES ($1, $2, $3)",
+        [uid, name, email]
+      );
+      return { status: 201, message: "User created" };
     } else {
-      const user = await getUser({ name });
-      console.log("User", user);
-      if (!user) {
-        const result = await pool.query(
-          "INSERT INTO users (name, email) VALUES ($1, $2)",
-          [name, email]
+      const users = await getUser({ email });
+      console.log(users);
+      if (users.length == 0) {
+        await pool.query(
+          "INSERT INTO users (uid, name, email) VALUES ($1, $2, $3)",
+          [uid, name, email]
         );
-        console.log("result", result);
         return { status: 201, message: "User created" };
       } else {
         return { status: 400, message: "User already exists" };
