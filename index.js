@@ -1,9 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const app = express();
-const db = require("./queries");
-const port = 5000;
+const dotenv = require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const userRoutes = require("./routes/userRoutes");
+const db = require("./db");
 
+const app = express();
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -11,24 +18,15 @@ app.use(
   })
 );
 
+// db.sync({ force: true }).then(() => {
+//   console.log("db has been re sync");
+// });
+
 app.get("/", (request, response) => {
-  response.json({ info: "Node.js, Express, and Postgres API" });
+  response.json({
+    info: "Node.js, Express, and Postgres API",
+    port: `Running at port - ${port}`,
+  });
 });
 
-// app.get("/users", db.getUsers);
-// app.get("/users/:id", db.getUserById);
-app.post("/users", async (req, res) => {
-  const user = await db.createUser(req.body);
-  console.log("response", user);
-  if (user.status == 201) {
-    res.status(201).json(user);
-  } else {
-    res.status(400).json({ message: "User already exists" });
-  }
-});
-// app.put("/users/:id", db.updateUser);
-// app.delete("/users/:id", db.deleteUser);
-
-app.listen(port, () => {
-  console.log(`App running on port ${port}.`);
-});
+app.use("/api/users", userRoutes);
