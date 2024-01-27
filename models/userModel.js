@@ -3,11 +3,11 @@ module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "user",
     {
-      firstName: {
+      first_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      lastName: {
+      last_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     },
-    { timestamps: true }
+    { timestamps: true, createdAt: "created_at", updatedAt: "updated_at" }
   );
   return User;
 };

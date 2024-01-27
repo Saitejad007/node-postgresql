@@ -41,7 +41,8 @@ const login = async (req, res) => {
           expiresIn: 60 * 60 * 1000,
         });
         res.cookie("jwt", token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
-        res.status(201).json(user);
+        const { password, ...others } = user.dataValues;
+        res.status(201).json(others);
       } else {
         res.status(401).send("Wrong Password");
       }
