@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const db = require("./db");
 
@@ -12,6 +13,13 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
 app.use(
   bodyParser.urlencoded({
     extended: true,

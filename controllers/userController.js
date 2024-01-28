@@ -26,8 +26,9 @@ const register = async (req, res) => {
       const token = jwt.sign({ id: user.id }, process.env.SECRET, {
         expiresIn: 60 * 60 * 1000,
       });
+      const { password, ...rest } = user.dataValues;
       res.cookie("jwt", token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
-      res.status(201).json({ user });
+      res.status(201).json({ user: rest });
     }
   } catch (error) {
     res.status(500).send(error);
@@ -45,7 +46,13 @@ const login = async (req, res) => {
         const token = jwt.sign({ id: user.id }, process.env.SECRET, {
           expiresIn: 60 * 60 * 1000,
         });
-        res.cookie("jwt", token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
+        console.log("Success");
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 1000,
+          secure: true,
+          sameSite: "none",
+        });
         const { password, ...others } = user.dataValues;
         res.status(200).json(others);
       } else {
