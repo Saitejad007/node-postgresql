@@ -28,10 +28,11 @@ const register = async (req, res) => {
       });
       const { password, ...rest } = user.dataValues;
       res.cookie("jwt", token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
-      res.status(201).json({ user: rest });
+      res.status(201).json({ user: rest, token });
     }
   } catch (error) {
     res.status(500).send(error);
+    console.log("eRRR", error);
   }
 };
 
@@ -54,7 +55,7 @@ const login = async (req, res) => {
           sameSite: "none",
         });
         const { password, ...others } = user.dataValues;
-        res.status(200).json(others);
+        res.status(200).json({ ...others, token });
       } else {
         res.status(401).send({
           message: "Invalid credentials",

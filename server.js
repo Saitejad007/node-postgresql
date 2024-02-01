@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
+const todoRoutes = require("./routes/todoRoutes");
 const db = require("./db");
 
 const app = express();
@@ -38,3 +39,4 @@ app.get("/", (request, response) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/todos", todoRoutes);

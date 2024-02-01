@@ -18,6 +18,7 @@ const connectDB = async () => {
 const db = {};
 db.Sequelize = Sequelize;
 db.users = require("./models/userModel")(sequelize, DataTypes);
+db.todos = require("./models/todoModel")(sequelize, DataTypes);
 
 connectDB();
 
@@ -33,18 +34,51 @@ CREATE TABLE IF NOT EXISTS users (
 )
 `;
 
-sequelize
-  .query(
-    "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='users' AND table_type='BASE TABLE'"
-  )
-  .then((tables) => {
-    if (tables && tables.length > 0) {
+const createTodosTableQuery = `
+CREATE TABLE IF NOT EXISTS todos (
+  todo_id SERIAL PRIMARY KEY,
+  comment VARCHAR(255),
+  user_id INTEGER,
+  completed BOOLEAN DEFAULT false,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+
+Promise.all([
+  sequelize.query(`
+    SELECT table_name 
+    FROM information_schema.tables 
+    WHERE table_schema='public' 
+    AND table_name='users' 
+    AND table_type='BASE TABLE'
+  `),
+  sequelize.query(`
+    SELECT table_name 
+    FROM information_schema.tables 
+    WHERE table_schema='public' 
+    AND table_name='todos' 
+    AND table_type='BASE TABLE'
+  `),
+])
+  .then(([userTables, todosTables]) => {
+    console.log(todosTables, "testttttt");
+    if (userTables && userTables.length > 0) {
       console.log("Users table exists in the database.");
     } else {
       console.log(
         "Users table does not exist in the database. Creating it now..."
       );
-      return sequelize.query(createUserTableQuery);
+      sequelize.query(createTableQuery);
+    }
+
+    if (todosTables && todosTables > 0) {
+      console.log("Todos table exists in the database.");
+    } else {
+      console.log(
+        "Todos table does not exist in the database. Creating it now..."
+      );
+      sequelize.query(createTodosTableQuery);
     }
   })
   .then(() => {
@@ -53,5 +87,26 @@ sequelize
   .catch((error) => {
     console.error("Error creating or checking users table:", error);
   });
+
+// sequelize
+//   .query(
+//     "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='users' AND table_type='BASE TABLE'"
+//   )
+//   .then((tables) => {
+//     if (tables && tables.length > 0) {
+//       console.log("Users table exists in the database.");
+//     } else {
+//       console.log(
+//         "Users table does not exist in the database. Creating it now..."
+//       );
+//       return sequelize.query(createTableQuery);
+//     }
+//   })
+//   .then(() => {
+//     console.log("Table creation or existence check completed successfully.");
+//   })
+//   .catch((error) => {
+//     console.error("Error creating or checking users table:", error);
+//   });
 
 module.exports = db;
