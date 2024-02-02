@@ -15,7 +15,6 @@ const addTodo = async (req, res) => {
     const { todo, userId } = req.body;
     console.log(req.body, "boddddy");
     const todoItem = await Todo.create({
-      // todo_id: 1,
       comment: todo,
       completed: false,
       user_id: userId,
@@ -23,6 +22,23 @@ const addTodo = async (req, res) => {
     res.status(201).json({ todoItem });
   } catch (err) {
     console.log(err);
+  }
+};
+
+const updateTodo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment } = req.body;
+    console.log("boduuu", req.body);
+    const todoItem = await Todo.findByPk(id);
+    if (!todoItem) return res.status(404).send({ message: "Todo not found" });
+    todoItem.comment = comment;
+    await todoItem.save();
+    res
+      .status(200)
+      .json({ status: "Update successful", ...todoItem.dataValues });
+  } catch (err) {
+    console.log(err, "ERRORR");
   }
 };
 
@@ -36,4 +52,4 @@ const deleteTodo = async (req, res) => {
   }
 };
 
-module.exports = { addTodo, getTodos, deleteTodo };
+module.exports = { addTodo, getTodos, updateTodo, deleteTodo };

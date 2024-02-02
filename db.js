@@ -88,25 +88,4 @@ Promise.all([
     console.error("Error creating or checking users table:", error);
   });
 
-// sequelize
-//   .query(
-//     "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='users' AND table_type='BASE TABLE'"
-//   )
-//   .then((tables) => {
-//     if (tables && tables.length > 0) {
-//       console.log("Users table exists in the database.");
-//     } else {
-//       console.log(
-//         "Users table does not exist in the database. Creating it now..."
-//       );
-//       return sequelize.query(createTableQuery);
-//     }
-//   })
-//   .then(() => {
-//     console.log("Table creation or existence check completed successfully.");
-//   })
-//   .catch((error) => {
-//     console.error("Error creating or checking users table:", error);
-//   });
-
 module.exports = db;
